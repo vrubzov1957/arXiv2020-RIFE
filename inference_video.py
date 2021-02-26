@@ -200,25 +200,25 @@ while True:
     I0 = I1
     I1 = torch.from_numpy(np.transpose(frame, (2,0,1))).to(device, non_blocking=True).unsqueeze(0).float() / 255.
     I1 = pad_image(I1)
-    I0_small = F.interpolate(I0, (32, 32), mode='bilinear', align_corners=False)
-    I1_small = F.interpolate(I1, (32, 32), mode='bilinear', align_corners=False)
-    ssim = ssim_matlab(I0_small, I1_small)
-    if ssim > 0.995 and args.skip:
-        if skip_frame % 100 == 0:
-            print("Warning: Your video has {} static frames, skipping them may change the duration of the generated video.".format(skip_frame))
-        skip_frame += 1
-        pbar.update(1)
-        continue
-    if ssim < 0.5:
-        output = []
-        step = 1 / (2 ** args.exp)
-        alpha = 0
-        for i in range((2 ** args.exp) - 1):
-            alpha += step
-            beta = 1-alpha
-            output.append(torch.from_numpy(np.transpose((cv2.addWeighted(frame[:, :, ::-1], alpha, lastframe[:, :, ::-1], beta, 0)[:, :, ::-1].copy()), (2,0,1))).to(device, non_blocking=True).unsqueeze(0).float() / 255.)
-    else:
-        output = make_inference(I0, I1, args.exp)
+    #I0_small = F.interpolate(I0, (32, 32), mode='bilinear', align_corners=False)
+    #I1_small = F.interpolate(I1, (32, 32), mode='bilinear', align_corners=False)
+    #ssim = ssim_matlab(I0_small, I1_small)
+    #if ssim > 0.995 and args.skip:
+    #    if skip_frame % 100 == 0:
+    #        print("Warning: Your video has {} static frames, skipping them may change the duration of the generated video.".format(skip_frame))
+    #    skip_frame += 1
+    #    pbar.update(1)
+    #    continue
+    #if ssim < 0.5:
+    #    output = []
+    #    step = 1 / (2 ** args.exp)
+    #    alpha = 0
+    #    for i in range((2 ** args.exp) - 1):
+    #        alpha += step
+    #        beta = 1-alpha
+    #        output.append(torch.from_numpy(np.transpose((cv2.addWeighted(frame[:, :, ::-1], alpha, lastframe[:, :, ::-1], beta, 0)[:, :, ::-1].copy()), (2,0,1))).to(device, non_blocking=True).unsqueeze(0).float() / 255.)
+    #else:
+    output = make_inference(I0, I1, args.exp)
     if args.montage:
         write_buffer.put(np.concatenate((lastframe, lastframe), 1))
         for mid in output:
