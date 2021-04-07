@@ -69,7 +69,7 @@ parser.add_argument('--fps', dest='fps', type=int, default=None)
 parser.add_argument('--png', dest='png', action='store_true', help='whether to vid_out png format vid_outs')
 parser.add_argument('--ext', dest='ext', type=str, default='mp4', help='vid_out video extension')
 parser.add_argument('--exp', dest='exp', type=int, default=1)
-parser.add_argument('--mat', dest='mat', type=int, default=10)
+parser.add_argument('--mat', dest='mat', type=int, default=1)
 args = parser.parse_args()
 assert (not args.video is None or not args.img is None)
 if not args.img is None:
