@@ -69,6 +69,7 @@ parser.add_argument('--fps', dest='fps', type=int, default=None)
 parser.add_argument('--png', dest='png', action='store_true', help='whether to vid_out png format vid_outs')
 parser.add_argument('--ext', dest='ext', type=str, default='mp4', help='vid_out video extension')
 parser.add_argument('--exp', dest='exp', type=int, default=1)
+parser.add_argument('--mat', dest='mat', type=int, default=10)
 args = parser.parse_args()
 assert (not args.video is None or not args.img is None)
 if not args.img is None:
@@ -212,16 +213,17 @@ while True:
     #    skip_frame += 1
     #    pbar.update(1)
     #    continue
-    #if ssim < 0.5:
-    #    output = []
-    #    step = 1 / (2 ** args.exp)
-    #    alpha = 0
-    #    for i in range((2 ** args.exp) - 1):
-    #        alpha += step
-    #        beta = 1-alpha
-    #        output.append(torch.from_numpy(np.transpose((cv2.addWeighted(frame[:, :, ::-1], alpha, lastframe[:, :, ::-1], beta, 0)[:, :, ::-1].copy()), (2,0,1))).to(device, non_blocking=True).unsqueeze(0).float() / 255.)
-    #else:
-    output = make_inference(I0, I1, args.exp)
+    levelDb = args.mat * 0.01
+    if ssim < levelDb: #0.5
+        output = []
+        step = 1 / (2 ** args.exp)
+        alpha = 0
+        for i in range((2 ** args.exp) - 1):
+            alpha += step
+            beta = 1-alpha
+            output.append(torch.from_numpy(np.transpose((cv2.addWeighted(frame[:, :, ::-1], alpha, lastframe[:, :, ::-1], beta, 0)[:, :, ::-1].copy()), (2,0,1))).to(device, non_blocking=True).unsqueeze(0).float() / 255.)
+    else:
+        output = make_inference(I0, I1, args.exp)
     if args.montage:
         write_buffer.put(np.concatenate((lastframe, lastframe), 1))
         for mid in output:
