@@ -204,9 +204,9 @@ while True:
     I0 = I1
     I1 = torch.from_numpy(np.transpose(frame, (2,0,1))).to(device, non_blocking=True).unsqueeze(0).float() / 255.
     I1 = pad_image(I1)
-    #I0_small = F.interpolate(I0, (32, 32), mode='bilinear', align_corners=False)
-    #I1_small = F.interpolate(I1, (32, 32), mode='bilinear', align_corners=False)
-    #ssim = ssim_matlab(I0_small, I1_small)
+    I0_small = F.interpolate(I0, (32, 32), mode='bilinear', align_corners=False)
+    I1_small = F.interpolate(I1, (32, 32), mode='bilinear', align_corners=False)
+    ssim = ssim_matlab(I0_small, I1_small)
     #if ssim > 0.995 and args.skip:
     #    if skip_frame % 100 == 0:
     #        print("Warning: Your video has {} static frames, skipping them may change the duration of the generated video.".format(skip_frame))
