@@ -34,9 +34,9 @@ def transferAudio(sourceVideo, targetVideo):
     os.rename(targetVideo, targetNoAudio)
     # combine audio file and new video file
     os.system("ffmpeg -y -i " + targetNoAudio + " -i " + tempAudioFileName + " -c copy " + targetVideo)
-    
-    os.system("ffprobe -i " + targetVideo + " -show_streams -select_streams a -loglevel error")
-    print("DONE")
+    if args.ffprobe:
+        os.system("ffprobe -i " + targetVideo + " -show_streams -select_streams a -loglevel error")
+    print("### DONE ###")
     
     if os.path.getsize(targetVideo) == 0: # if ffmpeg failed to merge the video and audio together try converting the audio to aac
         tempAudioFileName = "./temp/audio.m4a"
@@ -70,6 +70,7 @@ parser.add_argument('--png', dest='png', action='store_true', help='whether to v
 parser.add_argument('--ext', dest='ext', type=str, default='mp4', help='vid_out video extension')
 parser.add_argument('--exp', dest='exp', type=int, default=1)
 parser.add_argument('--mat', dest='mat', type=int, default=1)
+parser.add_argument('--ffprobe', dest='ffprobe', action='store_true', help='ffprobe on end')
 args = parser.parse_args()
 assert (not args.video is None or not args.img is None)
 if not args.img is None:
