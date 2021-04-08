@@ -28,17 +28,25 @@ def transferAudio(sourceVideo, targetVideo):
         # create new "temp" directory
         os.makedirs("temp")
         # extract audio from video
-        os.system("ffmpeg -y -i " + sourceVideo + " -c:a copy -vn " + tempAudioFileName)
+        if args.ffprobe:
+            os.system("ffmpeg -y error -i " + sourceVideo + " -c:a copy -vn " + tempAudioFileName)
+        else:
+            os.system("ffmpeg -y -hide_banner -loglevel error -i " + sourceVideo + " -c:a copy -vn " + tempAudioFileName)
     
     targetNoAudio = os.path.splitext(targetVideo)[0] + "_noaudio" + os.path.splitext(targetVideo)[1]
     os.rename(targetVideo, targetNoAudio)
     # combine audio file and new video file
-    os.system("ffmpeg -y -i " + targetNoAudio + " -i " + tempAudioFileName + " -c copy " + targetVideo)
+    if args.ffprobe:
+        os.system("ffmpeg -y error -i " + targetNoAudio + " -i " + tempAudioFileName + " -c copy " + targetVideo)
+    else:
+        os.system("ffmpeg -y -hide_banner -loglevel error -i " + targetNoAudio + " -i " + tempAudioFileName + " -c copy " + targetVideo)
+        
     if args.ffprobe:
         os.system("ffprobe -i " + targetVideo + " -show_streams -select_streams a -loglevel error")
     print("### DONE ###")
     
     if os.path.getsize(targetVideo) == 0: # if ffmpeg failed to merge the video and audio together try converting the audio to aac
+        print("ffmpeg failed to merge the video and audio together try converting the audio to aac")
         tempAudioFileName = "./temp/audio.m4a"
         os.system("ffmpeg -y -i " + sourceVideo + " -c:a aac -b:a 160k -vn " + tempAudioFileName)
         os.system("ffmpeg -y -i " + targetNoAudio + " -i " + tempAudioFileName + " -c copy " + targetVideo)
